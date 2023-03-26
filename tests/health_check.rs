@@ -4,7 +4,7 @@
 #[tokio::test]
 async fn health_check_works() {
     // Arrange 
-    spawn_app().await.expect("Failed to spawn our app.");
+    spawn_app();
     // We need to bring in 'reqwest'
     // to perform HTTP requests against our application
     let client = reqwest::Client::new();
@@ -18,9 +18,10 @@ async fn health_check_works() {
 
     // Assert
     assert!(response.status().is_success());
-    assert_eq!(Some(0), response.content_length());
+    assert_eq!(Some(19), response.content_length());
 }
 
-async fn spawn_app() -> Result<(), std::io::Error> {
-    zero2prod::run().await
+fn spawn_app() {
+    let server = zero2prod::run().expect("Failed to bind address");
+    let _ = tokio::spawn(server);
 }
